@@ -24,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
@@ -67,6 +69,10 @@ public class DaisyDiff {
                     .newInstance();
 
             TransformerHandler result = tf.newTransformerHandler();
+            Transformer trans = result.getTransformer();
+            trans.setOutputProperty(OutputKeys.METHOD, "html");
+            //trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            //trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             result.setResult(new StreamResult(outputString));
 
             StringReader baseStream, leftStream, rightStream;
@@ -78,7 +84,7 @@ public class DaisyDiff {
             XslFilter filter = new XslFilter();
 
             ContentHandler postProcess = htmlOut? filter.xsl(result,
-                    "org/outerj/daisy/diff/htmlheader.xsl"):result;
+                    "org/outerj/daisy/diff/htmlfragment.xsl"):result;
 
             Locale locale = Locale.getDefault();
             String prefix = "diff";
