@@ -45,6 +45,27 @@ public enum ModificationType {
         }
     },
 
+    LEFT {
+        @Override
+        public String toString() {
+            return "left";
+        }
+    },
+
+    RIGHT {
+        @Override
+        public String toString() {
+            return "right";
+        }
+    },
+
+    BOTH {
+        @Override
+        public String toString() {
+            return "both";
+        }
+    },
+
     NONE {
         @Override
         public String toString() {

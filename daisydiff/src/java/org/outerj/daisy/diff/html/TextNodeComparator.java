@@ -73,8 +73,10 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
      * @param start
      * @param end
      * @param outputFormat specifies how this range shall be formatted in the output
+     * @param side specifies which side (left or right) the modification was made on
+     * @param matchId specifies which changes should be "matched" (part of the same change)
      */
-    public void markAsNew(int start, int end, ModificationType outputFormat) {
+    public void markAsNew(int start, int end, ModificationType outputFormat, ModificationType side, int matchId) {
         if (end <= start)
             return;
 
@@ -84,7 +86,7 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
         List<Modification> nextLastModified = new ArrayList<Modification>();
 
         for (int i = start; i < end; i++) {
-            Modification mod = new Modification(ModificationType.ADDED, outputFormat);
+            Modification mod = new Modification(ModificationType.ADDED, outputFormat, side, matchId);
             mod.setID(newID);
             if (lastModified.size() > 0) {
                 mod.setPrevious(lastModified.get(0));
@@ -100,6 +102,17 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
         getTextNode(start).getModification().setFirstOfID(true);
         newID++;
         lastModified = nextLastModified;
+    }
+
+    /**
+     * Marks the given range as new. In the output, the range will be formatted
+     * as "added".
+     * @param start
+     * @param end
+     * @param outputFormat
+     */
+    public void markAsNew(int start, int end, ModificationType outputFormat) {
+      markAsNew(start, end, outputFormat, ModificationType.NONE, -1);
     }
 
     /**
@@ -132,7 +145,8 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
     private boolean changedIDUsed = false;
 
     public void handlePossibleChangedPart(int leftstart, int leftend,
-            int rightstart, int rightend, TextNodeComparator leftComparator) {
+            int rightstart, int rightend, TextNodeComparator leftComparator,
+            ModificationType side, int matchId) {
         int i = rightstart;
         int j = leftstart;
 
@@ -154,7 +168,7 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
 
             if (result.isChanged()) {
 
-                Modification mod = new Modification(ModificationType.CHANGED, ModificationType.CHANGED);
+                Modification mod = new Modification(ModificationType.CHANGED, ModificationType.CHANGED, side, matchId);
 
                 if (!changedIDUsed) {
                     mod.setFirstOfID(true);
@@ -203,6 +217,11 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
 
     }
 
+    public void handlePossibleChangedPart(int leftstart, int leftend,
+            int rightstart, int rightend, TextNodeComparator leftComparator) {
+      handlePossibleChangedPart(leftstart, leftend, rightstart, rightend, leftComparator, ModificationType.NONE, -1);
+    }
+
     // used to remove the whitespace between a red and green block
     private boolean whiteAfterLastChangedPart = false;
 
@@ -216,9 +235,11 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
      * @param oldComp
      * @param before
      * @param anOutputFormat specifies how this range shall be formatted in the output
+     * @param side specifies which side (left or right) the modification was made on
+     * @param matchId specifies which changes should be "matched" (part of the same change)
      */
     public void markAsDeleted(int start, int end, TextNodeComparator oldComp,
-            int before, ModificationType outputFormat) {
+            int before, ModificationType outputFormat, ModificationType side, int matchId) {
 
         if (end <= start)
             return;
@@ -232,7 +253,7 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
         List<Modification> nextLastModified = new ArrayList<Modification>();
 
         for (int i = start; i < end; i++) {
-            Modification mod = new Modification(ModificationType.REMOVED, outputFormat);
+            Modification mod = new Modification(ModificationType.REMOVED, outputFormat, side, matchId);
             mod.setID(deletedID);
             if (lastModified.size() > 0) {
                 mod.setPrevious(lastModified.get(0));
@@ -365,8 +386,22 @@ public class TextNodeComparator implements IRangeComparator, Iterable<TextNode> 
         lastModified = nextLastModified;
         deletedID++;
     }
+
+    /**
+     * Marks the given range as deleted. In the output, the range will be
+     * formatted as "removed".
+     * @param start
+     * @param end
+     * @param oldComp
+     * @param before
+     * @param outputFormat
+     */
+    public void markAsDeleted(int start, int end, TextNodeComparator oldComp,
+            int before, ModificationType outputFormat) {
+      markAsDeleted(start, end, oldComp, before, outputFormat, ModificationType.NONE, -1);
+    }
     
-	/**
+  	/**
      * Marks the given range as deleted. In the output, the range will be
      * formatted as "removed".
      * @param start

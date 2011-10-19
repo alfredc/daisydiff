@@ -53,6 +53,7 @@ public class HTMLDiffer implements Differ{
     	int currentIndexAncestor = 0;
     	int currentIndexLeft = 0;
     	int currentIndexRight = 0;
+      int matchId = 0;
     	for (RangeDifference d : pdifferences) {
     		
     		int tempKind = d.kind();
@@ -64,19 +65,19 @@ public class HTMLDiffer implements Differ{
     			if (d.leftStart() > currentIndexLeft) {
                     ancestorComparator.handlePossibleChangedPart(currentIndexLeft, d
                             .leftStart(), currentIndexAncestor, d.ancestorStart(),
-                            leftComparator);
+                            leftComparator, ModificationType.LEFT, matchId);
                 }
     			if (d.rightStart() > currentIndexRight) {
     				ancestorComparator.handlePossibleChangedPart(currentIndexRight, d
     						.rightStart(), currentIndexAncestor, d.ancestorStart(),
-    						rightComparator);
+    						rightComparator, ModificationType.RIGHT, matchId);
     			}
-			
+
     		if (tempKind == RangeDifference.CONFLICT || tempKind == RangeDifference.LEFT) {
     			// conflicts and changes on the left side
                 if (d.leftLength() > 0) {
                 	ancestorComparator.markAsDeleted(d.leftStart(), d.leftEnd(),
-                			leftComparator, d.ancestorStart(), ModificationType.ADDED);
+                			leftComparator, d.ancestorStart(), ModificationType.ADDED, ModificationType.LEFT, matchId);
                 }
     		}
 
@@ -84,24 +85,32 @@ public class HTMLDiffer implements Differ{
     			// conflicts and changes on the right side
                 if (d.rightLength() > 0) {
 	                ancestorComparator.markAsDeleted(d.rightStart(), d.rightEnd(),
-	                		rightComparator, d.ancestorStart(), ModificationType.ADDED);
+	                		rightComparator, d.ancestorStart(), ModificationType.ADDED, ModificationType.RIGHT, matchId);
                 }
     		}
-                ancestorComparator.markAsNew(d.ancestorStart(), d.ancestorEnd(), ModificationType.REMOVED);
+			
+        if (tempKind == RangeDifference.LEFT) {
+            ancestorComparator.markAsNew(d.ancestorStart(), d.ancestorEnd(), ModificationType.REMOVED, ModificationType.LEFT, matchId);
+        } else if (tempKind == RangeDifference.RIGHT) {
+            ancestorComparator.markAsNew(d.ancestorStart(), d.ancestorEnd(), ModificationType.REMOVED, ModificationType.RIGHT, matchId);
+        } else {  // conflict
+            ancestorComparator.markAsNew(d.ancestorStart(), d.ancestorEnd(), ModificationType.REMOVED, ModificationType.BOTH, matchId);
+        }
     		
     		currentIndexAncestor = d.ancestorEnd();
     		currentIndexLeft = d.leftEnd();
     		currentIndexRight = d.rightEnd();
+        matchId++;
     	}
     	if (currentIndexLeft < leftComparator.getRangeCount()) {
     		ancestorComparator.handlePossibleChangedPart(currentIndexLeft,
     				leftComparator.getRangeCount(), currentIndexAncestor,
-    				ancestorComparator.getRangeCount(), leftComparator);
+    				ancestorComparator.getRangeCount(), leftComparator, ModificationType.LEFT, matchId);
     	}
     	if (currentIndexRight < rightComparator.getRangeCount()) {
     		ancestorComparator.handlePossibleChangedPart(currentIndexRight,
     				rightComparator.getRangeCount(), currentIndexAncestor,
-    				ancestorComparator.getRangeCount(), rightComparator);
+    				ancestorComparator.getRangeCount(), rightComparator, ModificationType.RIGHT, matchId);
     	}
     	
     	ancestorComparator.expandWhiteSpace();

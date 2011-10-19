@@ -23,7 +23,12 @@ public class Modification implements Cloneable {
 
     private ModificationType outputType;
 
+    // Holds LEFT or RIGHT (for 3-way diffs)
+    private ModificationType side;
+
     private long id = -1;
+
+    private int matchId = -1;
 
     private Modification prevMod = null;
 
@@ -33,14 +38,23 @@ public class Modification implements Cloneable {
 
     private List<HtmlLayoutChange> htmlLayoutChanges = null;
 
+    // For 3-way diffs
+    public Modification(ModificationType type, ModificationType outputType, ModificationType side, int matchId) {
+        this.type = type;
+        this.outputType = outputType;
+        this.side = side;
+        this.matchId = matchId;
+    }
+
     public Modification(ModificationType type, ModificationType outputType) {
         this.type = type;
         this.outputType = outputType;
+        this.side = ModificationType.NONE; // 2-way diffs
     }
 
     @Override
     public Modification clone() {
-        Modification newM = new Modification(this.getType(), getOutputType());
+        Modification newM = new Modification(this.getType(), getOutputType(), getSide(), getMatchId());
         newM.setID(getID());
         newM.setChanges(getChanges());
         newM.setHtmlLayoutChanges(getHtmlLayoutChanges());
@@ -66,6 +80,15 @@ public class Modification implements Cloneable {
     public ModificationType getOutputType() {
     	return outputType;
     }
+
+    /**
+     * Returns the side (LEFT or RIGHT) that this modification was made on in a
+     * 3-way diff. In a 2-way diff, this should be ModificationType.NONE.
+     * @return the side this modification was made on
+     */
+    public ModificationType getSide() {
+      return side;
+    }
     
     public void setID(long id) {
         this.id = id;
@@ -73,6 +96,10 @@ public class Modification implements Cloneable {
 
     public long getID() {
         return id;
+    }
+
+    public int getMatchId() {
+        return matchId;
     }
 
     public void setPrevious(Modification m) {

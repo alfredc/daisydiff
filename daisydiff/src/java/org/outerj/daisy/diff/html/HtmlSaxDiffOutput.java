@@ -104,8 +104,16 @@ public class HtmlSaxDiffOutput implements DiffOutput {
                 // part can start
                 if (!newStarted && mod.getOutputType() == ModificationType.ADDED) {
                     AttributesImpl attrs = new AttributesImpl();
-                    attrs.addAttribute("", "class", "class", "CDATA",
-                            "diff-html-added");
+                    if (mod.getSide() == ModificationType.LEFT) {
+                        attrs.addAttribute("", "class", "class", "CDATA",
+                                "diff-html-added diff-html-left");
+                    } else if (mod.getSide() == ModificationType.RIGHT) {
+                        attrs.addAttribute("", "class", "class", "CDATA",
+                                "diff-html-added diff-html-right");
+                    } else {
+                        attrs.addAttribute("", "class", "class", "CDATA",
+                                "diff-html-added");
+                    }
                     if (mod.isFirstOfID()) {
                         attrs.addAttribute("", "id", "id", "CDATA", mod
                                 .getOutputType()
@@ -119,8 +127,16 @@ public class HtmlSaxDiffOutput implements DiffOutput {
                 } else if (!changeStarted
                         && mod.getOutputType() == ModificationType.CHANGED) {
                     AttributesImpl attrs = new AttributesImpl();
-                    attrs.addAttribute("", "class", "class", "CDATA",
-                            "diff-html-changed");
+                    if (mod.getSide() == ModificationType.LEFT) {
+                        attrs.addAttribute("", "class", "class", "CDATA",
+                                "diff-html-changed diff-html-left");
+                    } else if (mod.getSide() == ModificationType.RIGHT) {
+                        attrs.addAttribute("", "class", "class", "CDATA",
+                                "diff-html-changed diff-html-right");
+                    } else {
+                        attrs.addAttribute("", "class", "class", "CDATA",
+                                "diff-html-changed");
+                    }
                     if (mod.isFirstOfID()) {
                         attrs.addAttribute("", "id", "id", "CDATA", mod
                                 .getOutputType()
@@ -135,8 +151,19 @@ public class HtmlSaxDiffOutput implements DiffOutput {
                 } else if (!remStarted
                 		&& mod.getOutputType() == ModificationType.REMOVED) {
                 	AttributesImpl attrs = new AttributesImpl();
-                	attrs.addAttribute("", "class", "class", "CDATA",
-                	"diff-html-removed");
+                  if (mod.getSide() == ModificationType.LEFT) {
+                      attrs.addAttribute("", "class", "class", "CDATA",
+                              "diff-html-removed diff-html-left");
+                  } else if (mod.getSide() == ModificationType.RIGHT) {
+                      attrs.addAttribute("", "class", "class", "CDATA",
+                              "diff-html-removed diff-html-right");
+                  } else if (mod.getSide() == ModificationType.BOTH) {
+                      attrs.addAttribute("", "class", "class", "CDATA",
+                              "diff-html-removed diff-html-both");
+                  } else {
+                      attrs.addAttribute("", "class", "class", "CDATA",
+                              "diff-html-removed");
+                  }
                 	if (mod.isFirstOfID()) {
                 		attrs.addAttribute("", "id", "id", "CDATA", mod
                 				.getOutputType()
@@ -227,6 +254,8 @@ public class HtmlSaxDiffOutput implements DiffOutput {
 
         String changeId = mod.getOutputType() + "-" + prefix + "-" + mod.getID();
         attrs.addAttribute("", "changeId", "changeId", "CDATA", changeId);
+
+        attrs.addAttribute("", "matchId", "matchId", "CDATA", "" + mod.getMatchId());
 
         String next;
         if (mod.getNext() == null) {
