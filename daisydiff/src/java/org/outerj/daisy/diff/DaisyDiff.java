@@ -57,7 +57,7 @@ public class DaisyDiff {
     /**
      * For embedded 3-way diffs: takes 3 strings and returns a string.
      */
-    public static String diffHTML(String baseString, String leftString,
+    public static String diffHTMLString(String baseString, String leftString,
             String rightString) throws URISyntaxException {
 
         boolean htmlOut = true;
@@ -124,6 +124,80 @@ public class DaisyDiff {
 
             HTMLDiffer differ = new HTMLDiffer(output);
             differ.diff(baseComparator, leftComparator, rightComparator);
+            //System.out.print(".");
+            postProcess.endElement("", "diff", "diff");
+            postProcess.endElement("", "diffreport", "diffreport");
+            postProcess.endDocument();
+
+            return outputString.toString();
+        } catch (Throwable e) {
+            return e.getMessage();
+        }
+    }
+
+    /**
+     * For embedded 2-way diffs: takes 2 strings and returns a string.
+     * TODO: DRY this (mostly a copy of the 3-param diffHTMLString() above)
+     */
+    public static String diffHTMLString(String leftString,
+            String rightString) throws URISyntaxException {
+
+        boolean htmlOut = true;
+
+        StringWriter outputString = new StringWriter();
+
+        try {
+            SAXTransformerFactory tf = (SAXTransformerFactory) TransformerFactory
+                    .newInstance();
+
+            TransformerHandler result = tf.newTransformerHandler();
+            Transformer trans = result.getTransformer();
+            trans.setOutputProperty(OutputKeys.METHOD, "html");
+            //trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            //trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            result.setResult(new StreamResult(outputString));
+
+            StringReader leftStream, rightStream;
+
+            leftStream = new StringReader(leftString);
+            rightStream = new StringReader(rightString);
+
+            XslFilter filter = new XslFilter();
+
+            ContentHandler postProcess = htmlOut? filter.xsl(result,
+                    "org/outerj/daisy/diff/htmlfragment.xsl"):result;
+
+            Locale locale = Locale.getDefault();
+            String prefix = "diff";
+
+            HtmlCleaner cleaner = new HtmlCleaner();
+
+            InputSource leftSource = new InputSource(leftStream);
+            InputSource rightSource = new InputSource(rightStream);
+
+            DomTreeBuilder leftHandler = new DomTreeBuilder();
+            cleaner.cleanAndParse(leftSource, leftHandler);
+            //System.out.print(".");
+            TextNodeComparator leftComparator = new TextNodeComparator(
+                    leftHandler, locale);
+
+            DomTreeBuilder rightHandler = new DomTreeBuilder();
+            cleaner.cleanAndParse(rightSource, rightHandler);
+            //System.out.print(".");
+            TextNodeComparator rightComparator = new TextNodeComparator(
+                    rightHandler, locale);
+
+            postProcess.startDocument();
+            postProcess.startElement("", "diffreport", "diffreport",
+                    new AttributesImpl());
+            //doCSS(css, postProcess);
+            postProcess.startElement("", "diff", "diff",
+                    new AttributesImpl());
+            HtmlSaxDiffOutput output = new HtmlSaxDiffOutput(postProcess,
+                    prefix);
+
+            HTMLDiffer differ = new HTMLDiffer(output);
+            differ.diff(leftComparator, rightComparator);
             //System.out.print(".");
             postProcess.endElement("", "diff", "diff");
             postProcess.endElement("", "diffreport", "diffreport");
