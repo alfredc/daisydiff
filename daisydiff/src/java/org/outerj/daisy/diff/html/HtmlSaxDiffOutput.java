@@ -114,11 +114,11 @@ public class HtmlSaxDiffOutput implements DiffOutput {
                         attrs.addAttribute("", "class", "class", "CDATA",
                                 "diff-html-added");
                     }
-                    if (mod.isFirstOfID()) {
-                        attrs.addAttribute("", "id", "id", "CDATA", mod
-                                .getOutputType()
-                                + "-" + prefix + "-" + mod.getID());
-                    }
+                    //if (mod.isFirstOfID()) {
+                        //attrs.addAttribute("", "id", "id", "CDATA", mod
+                                //.getOutputType()
+                                //+ "-" + prefix + "-" + mod.getID());
+                    //}
 
                     addAttributes(mod, attrs);
 
@@ -137,11 +137,11 @@ public class HtmlSaxDiffOutput implements DiffOutput {
                         attrs.addAttribute("", "class", "class", "CDATA",
                                 "diff-html-changed");
                     }
-                    if (mod.isFirstOfID()) {
-                        attrs.addAttribute("", "id", "id", "CDATA", mod
-                                .getOutputType()
-                                + "-" + prefix + "-" + mod.getID());
-                    }
+                    //if (mod.isFirstOfID()) {
+                        //attrs.addAttribute("", "id", "id", "CDATA", mod
+                                //.getOutputType()
+                                //+ "-" + prefix + "-" + mod.getID());
+                    //}
 
                     addAttributes(mod, attrs);
                     handler.startElement("", "span", "span", attrs);
@@ -164,11 +164,11 @@ public class HtmlSaxDiffOutput implements DiffOutput {
                       attrs.addAttribute("", "class", "class", "CDATA",
                               "diff-html-removed");
                   }
-                	if (mod.isFirstOfID()) {
-                		attrs.addAttribute("", "id", "id", "CDATA", mod
-                				.getOutputType()
-                				+ "-" + prefix + "-" + mod.getID());
-                	}
+                  //if (mod.isFirstOfID()) {
+                    //attrs.addAttribute("", "id", "id", "CDATA", mod
+                        //.getOutputType()
+                        //+ "-" + prefix + "-" + mod.getID());
+                  //}
                 	addAttributes(mod, attrs);
                 	
                 	handler.startElement("", "span", "span", attrs);
@@ -178,11 +178,11 @@ public class HtmlSaxDiffOutput implements DiffOutput {
                     AttributesImpl attrs = new AttributesImpl();
                     attrs.addAttribute("", "class", "class", "CDATA",
                             "diff-html-conflict");
-                    if (mod.isFirstOfID()) {
-                        attrs.addAttribute("", "id", "id", "CDATA", mod
-                                .getOutputType()
-                                + "-" + prefix + "-" + mod.getID());
-                    }
+                    //if (mod.isFirstOfID()) {
+                        //attrs.addAttribute("", "id", "id", "CDATA", mod
+                                //.getOutputType()
+                                //+ "-" + prefix + "-" + mod.getID());
+                    //}
                     addAttributes(mod, attrs);
 
                     handler.startElement("", "span", "span", attrs);
@@ -243,28 +243,28 @@ public class HtmlSaxDiffOutput implements DiffOutput {
             attrs.addAttribute("", "changes", "changes", "CDATA", changes);
         }
 
-        String previous;
-        if (mod.getPrevious() == null) {
-            previous = "first-" + prefix;
-        } else {
-            previous = mod.getPrevious().getOutputType() + "-" + prefix + "-"
-                    + mod.getPrevious().getID();
-        }
-        attrs.addAttribute("", "previous", "previous", "CDATA", previous);
+        //String previous;
+        //if (mod.getPrevious() == null) {
+            //previous = "first-" + prefix;
+        //} else {
+            //previous = mod.getPrevious().getOutputType() + "-" + prefix + "-"
+                    //+ mod.getPrevious().getID();
+        //}
+        //attrs.addAttribute("", "previous", "previous", "CDATA", previous);
 
-        String changeId = mod.getOutputType() + "-" + prefix + "-" + mod.getID();
-        attrs.addAttribute("", "changeId", "changeId", "CDATA", changeId);
+        //String changeId = mod.getOutputType() + "-" + prefix + "-" + mod.getID();
+        //attrs.addAttribute("", "changeId", "changeId", "CDATA", changeId);
 
         attrs.addAttribute("", "matchId", "matchId", "CDATA", "" + mod.getMatchId());
 
-        String next;
-        if (mod.getNext() == null) {
-            next = "last-" + prefix;
-        } else {
-            next = mod.getNext().getOutputType() + "-" + prefix + "-"
-                    + mod.getNext().getID();
-        }
-        attrs.addAttribute("", "next", "next", "CDATA", next);
+        //String next;
+        //if (mod.getNext() == null) {
+            //next = "last-" + prefix;
+        //} else {
+            //next = mod.getNext().getOutputType() + "-" + prefix + "-"
+                    //+ mod.getNext().getID();
+        //}
+        //attrs.addAttribute("", "next", "next", "CDATA", next);
 
     }
 
